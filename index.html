@@ -1,13 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/index.css">
-  <script src="js/index.js"></script>
-  <title>Project 1 </title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Terminal Site</title>
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 5vw;
+      font-size: 4vw;
+      text-shadow: 0 0 5px #0f0; /* Dark Mode Aesthetic Glow */
+    }
+    #output {
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+    }
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    button {
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 8px 12px;
+      font-family: monospace;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 3.5vw;
+    }
+    button:hover {
+      background: #0f0;
+      color: #000;
+    }
+  </style>
 </head>
 <body>
-	<h1>Project 1 </h1>
+  <div id="output">Welcome to your terminal site. Tap a command to begin.</div>
+
+  <div class="btn-container">
+    <button onclick="runCommand('help')">help</button>
+    <button onclick="runCommand('about')">about</button>
+    <button onclick="runCommand('oracle')">oracle</button>
+    <button onclick="runCommand('skills')">skills</button>
+    <button onclick="runCommand('projects')">projects</button>
+    <button onclick="runCommand('contact')">contact</button>
+    <button onclick="runCommand('clear')">clear</button>
+  </div>
+
+  <script>
+    const output = document.getElementById("output");
+
+    const commands = {
+      help: 'Commands: about, oracle, skills, projects, contact, clear',
+      about: 'You are a curious explorer on the web, building something awesome.',
+      oracle: 'The oracle says: "Don’t wait for opportunity. Create it."',
+      skills: 'No formal coding skills yet.\nJust me, a bit of curiosity, and a lot of help from ChatGPT.\nLearning by building.',
+      projects: 'Projects:\n- Terminal Portfolio (this site)\n- Project 2: Coming soon!',
+      contact: 'Contact:\nEmail: <a href="mailto:kaydenintube@gmail.com" target="_blank">kaydenintube@gmail.com</a>\nGitHub: <a href="https://github.com/kayden0143" target="_blank">github.com/kayden0143</a>\nLinkedIn: <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a>'
+    };
+
+    // Typewriter effect for commands
+    function typeText(text, cmd) {
+      const lines = [`> ${cmd}`, ...text.split('\n')];
+      let index = 0;
+      let lineIndex = 0;
+      output.innerHTML += `<br>`;
+
+      function typeLine() {
+        if (lineIndex >= lines.length) return;
+
+        const span = document.createElement('div');
+        output.appendChild(span);
+
+        const interval = setInterval(() => {
+          if (index < lines[lineIndex].length) {
+            span.innerHTML += lines[lineIndex].charAt(index++);
+            window.scrollTo(0, document.body.scrollHeight);
+          } else {
+            clearInterval(interval);
+            index = 0;
+            lineIndex++;
+            typeLine();
+          }
+        }, 50);
+      }
+
+      typeLine();
+    }
+
+    // Play sound effect when command button is clicked
+    const clickSound = new Audio('path/to/sound.mp3'); // Replace with your sound file path
+    function playClickSound() {
+      clickSound.play();
+    }
+
+    // Run the command
+    function runCommand(cmd) {
+      playClickSound();
+
+      if (cmd === "clear") {
+        output.innerHTML = "";
+      } else if (commands[cmd]) {
+        typeText(commands[cmd], cmd);
+      } else {
+        typeText('Command not found. Tap "help"', cmd);
+      }
+
+      // Save command history to localStorage
+      let commandHistory = JSON.parse(localStorage.getItem('commandHistory')) || [];
+      commandHistory.push(cmd);
+      localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
+
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // Load command history from localStorage on page load (optional)
+    window.onload = () => {
+      const commandHistory = JSON.parse(localStorage.getItem('commandHistory')) || [];
+      if (commandHistory.length) {
+        commandHistory.forEach(cmd => typeText(commands[cmd] || 'Command not found.', cmd));
+      }
+    };
+  </script>
 </body>
 </html>
